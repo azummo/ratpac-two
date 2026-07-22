@@ -17,16 +17,16 @@ void FitQuadProc::BeginOfRun(DS::Run *run) {
 
   // TODO: Figure out experiment agnostic way to specify index for quad to use
   DBLinkPtr quad_db = db->GetLink("FIT_QUAD");
-  fNumQuadPoints = quad_db->GetI("num_points");
-  fMaxQuadPoints = quad_db->GetI("max_points");
-  fTableCutOff = quad_db->GetI("table_cut_off");
+  if (!WasSet("num_points")) fNumQuadPoints = quad_db->GetI("num_points");
+  if (!WasSet("max_points")) fMaxQuadPoints = quad_db->GetI("max_points");
+  if (!WasSet("table_cut_off")) fTableCutOff = quad_db->GetI("table_cut_off");
   if (fTableCutOff > fNumPointsTbl.size()) {
     Log::Die("Quad tried to set a table_cut_off larger than the size of fNumPointsTbl.");
   }
-  fLightSpeed = quad_db->GetD("light_speed");
+  if (!WasSet("light_speed")) fLightSpeed = quad_db->GetD("light_speed");
   if (fLightSpeed <= 0.0 || fLightSpeed > 299.792458)
     Log::Die("Quad tried to set a light_speed <= 0 or > 299.792458 mm/ns.");
-  fMaxRadius = quad_db->GetD("max_radius");
+  if (!WasSet("max_radius")) fMaxRadius = quad_db->GetD("max_radius");
 }
 
 void FitQuadProc::SetI(std::string param, int value) {

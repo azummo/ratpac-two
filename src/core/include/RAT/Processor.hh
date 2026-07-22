@@ -29,6 +29,7 @@
 
 #include <RAT/DS/Root.hh>
 #include <RAT/DS/Run.hh>
+#include <set>
 #include <string>
 
 namespace RAT {
@@ -36,6 +37,9 @@ namespace RAT {
 class Processor {
  protected:
   std::string name;
+
+  /** Names of the parameters set by the user with /rat/procset. */
+  std::set<std::string> setParams;
 
  public:
   /** The short name of this processor. */
@@ -150,6 +154,29 @@ class Processor {
    *  @throws ParamInvalid if value is not allowed for param.
    */
   virtual void SetS(std::string param, std::string value);
+
+  /** Record that param was successfully set by the user.
+   *
+   *  Called by ProcBlockManager after a /rat/procset command, so that
+   *  BeginOfRun() can tell user-supplied values apart from defaults.
+   *
+   *  @param[in]  param  Name of parameter.
+   */
+  void MarkParamSet(std::string param) { setParams.insert(param); }
+
+  /** Test whether param was set by the user with /rat/procset.
+   *
+   *  BeginOfRun() implementations which load their defaults from RATDB
+   *  must guard each assignment with this, otherwise the defaults
+   *  silently overwrite whatever the user asked for in the macro.  The
+   *  name to test is the one accepted by SetI()/SetD()/SetS(), which is
+   *  not always the RATDB field name.
+   *
+   *  @param[in]  param  Name of parameter.
+   *
+   *  @return True if the user set param.
+   */
+  bool WasSet(std::string param) const { return setParams.count(param) > 0; }
 
   /** Process one physics event.
    *

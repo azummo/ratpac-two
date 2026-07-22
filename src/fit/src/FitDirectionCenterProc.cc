@@ -17,7 +17,7 @@ namespace RAT {
 void FitDirectionCenterProc::BeginOfRun(DS::Run *run) {
   DB *db = DB::Get();
   DBLinkPtr table = db->GetLink("Fitter", "FitDirectionCenter");
-  fLightSpeed = table->GetD("light_speed");
+  if (!WasSet("light_speed")) fLightSpeed = table->GetD("light_speed");
   if (fLightSpeed <= 0 || fLightSpeed > 299.792458)
     throw ParamInvalid("light_speed", "light_speed in Fitter table must be positive and <= 299.792458 mm/ns.");
 
